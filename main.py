@@ -12,7 +12,6 @@ import httpx
 
 Base.metadata.create_all(bind=engine)
 
-
 # starting FastAPI
 app = FastAPI()
 
@@ -66,9 +65,9 @@ def return_mock():
 
 @app.get("/mock/getcompany")
 async def get_company():
-
+    # no caso aqui seria a classe Store, certo?
     async with httpx.AsyncClient() as client:
-        mock_response = await client.get("http://127.0.0.1:8000/mock")  # Update the URL accordingly
+        mock_response = await client.get("http://127.0.0.1:8000/mock")
 
         if mock_response.status_code == 200:
             json_data = mock_response.json()
