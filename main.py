@@ -57,3 +57,9 @@ def update(id: int, request: CompanyRequest, db: Session = Depends(get_db)):
         )
     company = CompanyRepository.save(db, Company(id=id, **request.dict()))
     return CompanyResponse.from_orm(company)
+
+
+@app.get("/mock")
+def return_mock():
+    return {"identification": 2, "company_description": "Mock Name"}
+
