@@ -5,10 +5,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from database import engine, Base, get_db
-from models import Company
+from models import Company, Transform
 from repository import CompanyRepository
 from schemas import CompanyRequest, CompanyResponse
-
+import httpx
 
 Base.metadata.create_all(bind=engine)
 
@@ -63,3 +63,27 @@ def update(id: int, request: CompanyRequest, db: Session = Depends(get_db)):
 def return_mock():
     return {"identification": 2, "company_description": "Mock Name"}
 
+
+@app.get("/mock/getcompany")
+async def get_company():
+
+    async with httpx.AsyncClient() as client:
+        mock_response = await client.get("http://127.0.0.1:8000/mock")  # Update the URL accordingly
+
+        if mock_response.status_code == 200:
+            json_data = mock_response.json()
+        else:
+            raise HTTPException(status_code=500, detail="Failed to fetch mock data")
+
+    company_obj = Transform.from_mock_to_company(json_data)
+
+    return company_obj
+
+
+@app.post("/mock/createmock")
+async def create_company(name: str):
+    company_obj = Company(name=name)
+
+    json_data = Transform.from_company_to_mock(company_obj)
+
+    return json_data
